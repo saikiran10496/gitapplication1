@@ -1,7 +1,8 @@
+# Trigger only on pull requests targeting the 'master' branch
 pr:
   branches:
     include:
-      - master  # Trigger pipeline on PR targeting the 'master' branch
+      - master  # Change this to your target branch (e.g., 'main')
 
 pool:
   vmImage: 'windows-latest'
@@ -10,7 +11,7 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  
+
 stages:
 - stage: build
   displayName: 'Build stage'
@@ -42,10 +43,10 @@ stages:
         artifactName: 'WebAppArtifact'
         targetPath: '$(build.artifactStagingDirectory)'
 
-# Deploy Stage, runs only if NOT a PR trigger
+# Deploy Stage, runs only if it's NOT triggered by a PR event
 - stage: Deploy
   displayName: 'Deploy Stage'
-  condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'refs/pull/'))
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   jobs:
   - job: DeployJob
     displayName: 'Deploy Job'
