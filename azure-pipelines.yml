@@ -1,5 +1,7 @@
-trigger:
-- master
+pr:
+  branches:
+    include:
+      - master  # Trigger pipeline on PR targeting the 'master' branch
 
 pool:
   vmImage: 'windows-latest'
@@ -39,8 +41,11 @@ stages:
       inputs:
         artifactName: 'WebAppArtifact'
         targetPath: '$(build.artifactStagingDirectory)'
+
+# Deploy Stage, runs only if NOT a PR trigger
 - stage: Deploy
   displayName: 'Deploy Stage'
+  condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'refs/pull/'))
   jobs:
   - job: DeployJob
     displayName: 'Deploy Job'
